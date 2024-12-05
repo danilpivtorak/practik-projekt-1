@@ -1,0 +1,168 @@
+class SportShop:
+    def __init__(self):
+        self.sports_goods = [
+            {"id": 1, "name": "Футбольний м'яч", "price": 1200},
+            {"id": 2, "name": "Тенісна ракетка", "price": 2500},
+            {"id": 3, "name": "Кросівки для бігу", "price": 3000}
+        ]
+        self.cart = []
+        self.address = ""
+        self.payment_method = ""
+        self.order_history = []  # Історія замовлень
+
+    def show_sports_goods(self):
+        while True:
+            print("\nДоступні спортивні товари:")
+            for item in self.sports_goods:
+                print(f'{item["id"]}. {item["name"]} - {item["price"]} грн')
+            print("\nВведіть ID товару для додавання до кошика або '0' для виходу:")
+            choice = input("Ваш вибір: ")
+            if choice == "0":
+                break
+            else:
+                try:
+                    item_id = int(choice)
+                    self.add_to_cart(item_id)
+                except ValueError:
+                    print("Неправильний ввід. Будь ласка, введіть число.")
+
+    def add_to_cart(self, item_id):
+        item = next((x for x in self.sports_goods if x["id"] == item_id), None)
+        if item:
+            self.cart.append(item)
+            print(f'{item["name"]} додано до кошика.')
+        else:
+            print("Неправильний ID товару.")
+
+    def show_cart(self):
+        if not self.cart:
+            print("Ваш кошик порожній.")
+        else:
+            print("\nВаш кошик:")
+            for item in self.cart:
+                print(f'{item["name"]} - {item["price"]} грн')
+            print("Введіть ID товару для видалення з кошика або '0' для виходу:")
+            choice = input("Ваш вибір: ")
+            if choice != "0":
+                try:
+                    item_id = int(choice)
+                    self.remove_from_cart(item_id)
+                except ValueError:
+                    print("Неправильний ввід. Будь ласка, введіть число.")
+
+    def remove_from_cart(self, item_id):
+        item = next((x for x in self.cart if x["id"] == item_id), None)
+        if item:
+            self.cart.remove(item)
+            print(f'{item["name"]} видалено з кошика.')
+        else:
+            print("Неправильний ID товару.")
+
+    def enter_address(self):
+        self.address = input("Введіть адресу доставки: ")
+
+    def choose_payment_method(self):
+        print("Виберіть спосіб оплати:")
+        print("1. Картка")
+        print("2. Готівка при отриманні")
+        choice = input("Введіть номер вибраного способу оплати: ")
+        if choice == "1":
+            self.payment_method = "Картка"
+        elif choice == "2":
+            self.payment_method = "Готівка при отриманні"
+        else:
+            print("Неправильний вибір.")
+
+    def checkout(self):
+        if not self.cart:
+            print("Ваш кошик порожній.")
+            return
+
+        self.enter_address()
+        self.choose_payment_method()
+
+        if not self.address:
+            print("Введіть адресу доставки.")
+            return
+        if not self.payment_method:
+            print("Виберіть спосіб оплати.")
+            return
+
+        print("\nПідсумок замовлення:")
+        total = 0
+        for item in self.cart:
+            print(f'{item["name"]} - {item["price"]} грн')
+            total += item["price"]
+        print(f'Загальна сума: {total} грн')
+        print(f'Адреса доставки: {self.address}')
+        print(f'Спосіб оплати: {self.payment_method}')
+        print("Дякуємо за ваше замовлення!")
+
+        order = {
+            "items": self.cart.copy(),
+            "total": total,
+            "address": self.address,
+            "payment_method": self.payment_method
+        }
+        self.order_history.append(order)
+        self.cart.clear()
+
+    def add_new_sports_good(self):
+        print("Додавання нового товару:")
+        try:
+            name = input("Введіть назву товару: ")
+            price = int(input("Введіть ціну товару (грн): "))
+            new_id = max([item["id"] for item in self.sports_goods]) + 1
+            new_item = {"id": new_id, "name": name, "price": price}
+            self.sports_goods.append(new_item)
+            print(f'{name} додано до асортименту.')
+        except ValueError:
+            print("Неправильний ввід. Ціна повинна бути числом.")
+
+    def show_order_history(self):
+        if not self.order_history:
+            print("Історія замовлень порожня.")
+        else:
+            print("\nІсторія замовлень:")
+            for idx, order in enumerate(self.order_history):
+                print(f"\nЗамовлення #{idx + 1}:")
+                for item in order["items"]:
+                    print(f'{item["name"]} - {item["price"]} грн')
+                print(f'Загальна сума: {order["total"]} грн')
+                print(f'Адреса доставки: {order["address"]}')
+                print(f'Спосіб оплати: {order["payment_method"]}')
+
+
+def main():
+    shop = SportShop()
+
+    while True:
+        print("\nМеню:")
+        print("1. Показати спортивні товари")
+        print("2. Переглянути кошик")
+        print("3. Оформити замовлення")
+        print("4. Додати новий товар")
+        print("5. Переглянути історію замовлень")
+        print("6. Вийти")
+
+        choice = input("Виберіть пункт меню: ")
+
+        if choice == "1":
+            shop.show_sports_goods()
+        elif choice == "2":
+            shop.show_cart()
+        elif choice == "3":
+            shop.checkout()
+        elif choice == "4":
+            shop.add_new_sports_good()
+        elif choice == "5":
+            shop.show_order_history()
+        elif choice == "6":
+            print("До побачення!")
+            break
+        else:
+            print("Неправильний вибір. Спробуйте ще раз.")
+
+if __name__ == "__main__":
+    main()
+   
